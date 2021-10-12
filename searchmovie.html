@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <title>Document</title>
+  </head>
+
+  <style>
+    body {
+      font-family: "Fira Sans", sans-serif;
+      text-align: center;
+    }
+    input {
+      font-family: "Fira Sans", sans-serif;
+      font-size: 15px;
+      width: 200px;
+      display: block;
+      margin: auto;
+    }
+
+    #movies {
+      margin: auto;
+      text-align: left;
+      height: 200px;
+      width: 206px;
+      border: 1px solid black;
+      overflow: scroll;
+      border-top: none;
+    }
+    .diff-movie {
+      margin: 5px 3px;
+      padding: 2px;
+      border: 1px solid aliceblue;
+    }
+  </style>
+  <body>
+    <input
+      oninput="debounce(main,1000)"
+      type="text"
+      id="movie"
+      placeholder="Enter movie name"
+    />
+
+    <div id="movies"></div>
+  </body>
+</html>
+<script>
+  async function searchmovie(movie_name) {
+    try {
+      let res = await fetch(
+        `http://www.omdbapi.com/?apikey=5f3b3e73&s=${movie_name}`
+      );
+
+      let data = await res.json();
+      // console.log('data:', data);
+
+      return data;
+    } catch (e) {
+      console.log("e:", e);
+    }
+  }
+
+  let movies_div = document.getElementById("movies");
+  function appendMovie(movies) {
+    if (movies === undefined) {
+      return false;
+    }
+    movies_div.innerHTML = null;
+    movies.forEach(function (movi) {
+      let p = document.createElement("p");
+      p.setAttribute("class", "diff-movie");
+      p.innerText = movi.Title;
+
+      movies_div.append(p);
+    });
+  }
+
+  async function main() {
+    let name = document.getElementById("movie").value;
+
+    if (name.length < 3) {
+      return false;
+    }
+
+    let res = await searchmovie(name);
+
+    appendMovie(res.Search);
+
+    console.log("res:", res);
+  }
+
+  var TimerId;
+
+  function debounce(func, delay) {
+    if (TimerId) {
+      clearTimeout(TimerId);
+    }
+
+    TimerId = setTimeout(() => {
+      func();
+    }, delay);
+  }
+</script>
